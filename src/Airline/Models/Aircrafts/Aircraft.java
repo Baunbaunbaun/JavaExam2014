@@ -5,18 +5,18 @@ abstract public class Aircraft {
     public String name;
     public String model;
     public int passengerCapacity;
-    public int numberOfCrew;
+    public int crewCapacity;
 
     //constructor
     public Aircraft(
             String name,
             String model,
             int numberOfPassengers,
-            int numberOfCrew) {
+            int crewCapacity) {
 
         this.name = name;
         this.model = model;
         this.passengerCapacity = numberOfPassengers;
-        this.numberOfCrew = numberOfCrew;
+        this.crewCapacity = crewCapacity;
     }
 }

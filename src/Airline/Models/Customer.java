@@ -11,7 +11,12 @@ public class Customer extends Person {
         super(name);
     }
 
-    public void checkIn(Customer customer, Flight flight) {
-        //check if the flight is booked for this passenger
+    public boolean checkIn(Customer customer, Flight flight) {
+        if (!this.bookings.containsKey(flight)) {
+            this.bookings.put(flight, UUID.randomUUID());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

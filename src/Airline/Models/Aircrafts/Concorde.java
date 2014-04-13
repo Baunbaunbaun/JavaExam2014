@@ -6,7 +6,7 @@ public class Concorde extends Aircraft {
         super(name, "Aérospatiale-BAC Concorde", 100, 3);
     }
     public int getNumberOfCrew() {
-        return this.numberOfCrew;
+        return this.crewCapacity;
     }
 
     public int getPassengerCapacity() {
