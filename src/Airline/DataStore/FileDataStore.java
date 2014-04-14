@@ -4,6 +4,7 @@ import Airline.Models.Flight;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class FileDataStore implements IDataStorage, Serializable {
 
@@ -13,11 +14,12 @@ public class FileDataStore implements IDataStorage, Serializable {
         this.file = file;
     }
 
-    public HashMap<Integer, Flight> flights = new HashMap<Integer, Flight>();
+    public HashMap<UUID, Flight> flights = new HashMap<UUID, Flight>();
+
 
     public void createFlight(Flight flight) {
 
-        this.flights.put(flight.id, flight);
+        this.flights.put(flight.flightNo, flight);
 
         this.write();
     }

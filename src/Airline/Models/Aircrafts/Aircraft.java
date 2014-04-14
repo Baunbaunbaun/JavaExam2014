@@ -11,12 +11,16 @@ abstract public class Aircraft {
     public Aircraft(
             String name,
             String model,
-            int numberOfPassengers,
+            int passengerCapacity,
             int crewCapacity) {
 
         this.name = name;
         this.model = model;
-        this.passengerCapacity = numberOfPassengers;
+        this.passengerCapacity = passengerCapacity;
         this.crewCapacity = crewCapacity;
+    }
+    @Override
+    public String toString(){
+        return ("Name: " + this.name + "Model: " + this.model + "Passenger seats: " + this.passengerCapacity + "Number of crew: " + this.crewCapacity);
     }
 }

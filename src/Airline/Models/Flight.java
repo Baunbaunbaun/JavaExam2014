@@ -2,27 +2,33 @@ package Airline.Models;
 
 import Airline.Models.Aircrafts.Aircraft;
 import Airline.Program;
-
+import java.util.Date;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.UUID;
 
 public class Flight implements Serializable {
 
     private HashSet<Staff> crew;
     //passenger list with customers and seat numbers
     private HashSet<Customer> passengers;
+    private Date departureDate;
     private Aircraft aircraft;
-    //make this UUID
-    public int id;
+    private Airport departure;
+    private Airport destination;
+    public UUID flightNo;
 
     //constructor
-    public Flight(Aircraft aircraft) {
+    public Flight(Date date, Aircraft aircraft, Airport departure, Airport destination) {
+        this.departureDate = date;
         this.aircraft = aircraft;
+        this.departure = departure;
+        this.destination = destination;
+        this.flightNo = UUID.randomUUID();
     }
 
     //save method
     public boolean save() {
-
         Program.ds.createFlight(this);
         return true;
     }
@@ -54,11 +60,11 @@ public class Flight implements Serializable {
             return false;
         }
     }
-
+/*
     //what have I booked?
     public void myBookings(){
         //return result from database
-    }
+    }*/
 
     //get number of available seats
     public int availableSeats() {
@@ -68,5 +74,11 @@ public class Flight implements Serializable {
     //print passenger list
     public void passengerList() {
         System.out.println(this.passengers);
+    }
+    @Override
+    public String toString(){
+        return ("Flight No.: " + this.flightNo +
+                "\nDeparture: " + this.departureDate +
+                "\nFrom: " + this.departure + " To: " + this.destination);
     }
 }

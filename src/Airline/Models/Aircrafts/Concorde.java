@@ -9,7 +9,6 @@ public class Concorde extends Aircraft {
         return this.crewCapacity;
     }
 
-
     public int getPassengerCapacity() {
         return this.passengerCapacity;
     }
