@@ -1,4 +1,4 @@
-package Airline.DataStore;
+package Airline.Model.DataStore;
 
 import Airline.Model.Flight;
 import Airline.Model.Person.Person;
@@ -8,11 +8,11 @@ import java.util.HashSet;
 
 public class FileDataStore implements IDataStorage, Serializable {
 
-    private String path;
+    private final String path;
 
     private HashSet<Flight> flights;
 
-    public FileDataStore(String path) {
+    public FileDataStore(final String path) {
         this.path = path;
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
@@ -21,14 +21,18 @@ public class FileDataStore implements IDataStorage, Serializable {
         } catch (Exception ex) {
             this.flights = new HashSet<Flight>();
 
+        } finally {
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    writeToDisk();
+                }
+            });
         }
     }
-
     @Override
     public boolean saveFlight(Flight flight) {
-
-        this.flights.add(flight);
-        return this.write();
+        return this.flights.add(flight);
     }
 
     @Override
@@ -53,7 +57,7 @@ public class FileDataStore implements IDataStorage, Serializable {
         return this.flights.remove(flight);
     }
 
-    private boolean write() {
+    private boolean writeToDisk() {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(this.path));
             oos.writeObject(this);

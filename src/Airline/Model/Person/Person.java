@@ -1,6 +1,8 @@
 package Airline.Model.Person;
 
-abstract public class Person {
+import java.io.Serializable;
+
+abstract public class Person implements Serializable {
 
     public String name;
 

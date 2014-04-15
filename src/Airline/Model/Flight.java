@@ -3,7 +3,6 @@ package Airline.Model;
 import Airline.Model.Aircraft.Aircraft;
 import Airline.Model.Person.Customer;
 import Airline.Model.Person.Staff;
-import Airline.Program;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,55 +10,42 @@ import java.util.HashSet;
 
 public class Flight implements Serializable {
 
-    private String id;
-    private HashSet<Staff> crew;
-    private HashMap<Customer, Booking> bookings;
-    // TODO:
-    // handle capacity and null pointers if no airfract is assigned to the flight.
-    private Aircraft aircraft;
+    final private Aircraft aircraft;
+    public final String id;
+    private HashSet<Staff> crew = new HashSet<Staff>();
+    private HashMap<Customer, Booking> bookings = new HashMap<Customer, Booking>();
     private Airport from;
     private Airport to;
     private int time;
 
-    //constructor
-    public Flight(String id, Airport from, Airport to, int time) throws Exception {
-        this.setId(id);
+    public Flight(String id, Aircraft aircraft, Airport from, Airport to, int time) throws FlightNameException {
+        if (id.matches("\\w\\w\\d\\d\\d\\d")) {
+            this.id = id.toUpperCase();
+        } else {
+            throw new FlightNameException();
+        }
         this.from = from;
         this.to = to;
         this.time = time;
+        this.aircraft = aircraft;
     }
 
     public HashMap<Customer, Booking> getBookings() {
         return bookings;
     }
 
-    public void setId(String id) throws Exception {
-        // 2 letters and 4 digitsm eg EK2031
-        if (id.matches("\\w\\w\\d\\d\\d\\d")) {
-            this.id = id.toUpperCase();
-        } else {
-            throw new Exception("Illigal FlightId");
-        }
-    }
-
     public boolean addStaff(Staff staff) {
-
-        if (this.crew.size() < this.aircraft.getCrewCapacity())
+        if (this.crew.size() < this.aircraft.crewCapacity)
             return this.crew.add(staff);
         return false;
     }
 
-
-    public void bookSeat(Customer customer) {
-
-        // REMEMBER NULLPOINTER NO AIRCRAFT EX
-        // Exceptions would be nice, to handle more cases of failures here
-        // 1. already booked
-        // 2. no space
-        // 3. aircraft no assigned to flight
-
-        if (this.availableSeats() > 0)
+    public void bookSeat(Customer customer) throws BookingException {
+        if (this.availableSeats() > 0 && !this.bookings.containsKey(customer))
             this.bookings.put(customer, new Booking((customer)));
+        else {
+            throw new BookingException();
+        }
     }
 
     public void checkIn(Customer customer) {
@@ -67,16 +53,66 @@ public class Flight implements Serializable {
     }
 
 
-    //get number of available seats
     private int availableSeats() {
-        return (this.aircraft.getPassengerCapacity() - this.bookings.size());
+        return (this.aircraft.passengerCapacity - this.bookings.size());
     }
 
-    //save method
+    public int getTime() {
+        return this.time;
+    }
+
+    public Airport getTo() {
+        return this.to;
+    }
+
+    public Airport getFrom() {
+        return this.from;
+    }
+
+    public Aircraft getAircraft() {
+        return this.aircraft;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
     public boolean save() {
-        Program.dataStore.saveFlight(this);
+        Model.dataStore.saveFlight(this);
         return true;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("Id: ").append(this.id).append('\n')
+                .append("Aircraft: ").append(aircraft.name);
+
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Flight) {
+            Flight f = (Flight) other;
+            return this.id.equals(f.id);
+        }
+        return false;
+    }
+
+
+    public class BookingException extends Exception {
+    }
+
+    public class FlightNameException extends Exception {
+    }
+
 
     private class Booking implements Serializable {
 
@@ -92,7 +128,5 @@ public class Flight implements Serializable {
         public void checkIn() {
             this.checkedIn = true;
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-package Airline.DataStore;
+package Airline.Model.DataStore;
 
 import Airline.Model.Flight;
 import Airline.Model.Person.Person;
