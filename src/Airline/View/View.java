@@ -17,9 +17,7 @@ public class View implements java.util.Observer {
     //needed only if view initialises model (which we aren't doing)
 
     public View() {
-        System.out.println("View()");
 
-        //frame in constructor and not an attribute as doesn't need to be visible to whole class
         Frame frame = new Frame("simple MVC");
         frame.add("North", new Label("counter"));
 
@@ -37,9 +35,8 @@ public class View implements java.util.Observer {
         frame.setLocation(100, 100);
         frame.setVisible(true);
 
-    } //View()
+    }
 
-    // Called from the Model
     public void update(Observable obs, Object obj) {
 
         //who called us and what did they send?

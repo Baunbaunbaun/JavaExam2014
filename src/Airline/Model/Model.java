@@ -22,7 +22,6 @@ public class Model extends java.util.Observable {
         ++this.counter;
         System.out.println("Model     : counter = " + counter);
         setChanged();
-
         notifyObservers(counter);
     }
 }
