@@ -1,15 +1,18 @@
 package Airline.DataStore;
 
-import Airline.Models.Flight;
+import Airline.Model.Flight;
+import Airline.Model.Person.Person;
+
+import java.util.HashSet;
 
 public interface IDataStorage {
 
-    public void createFlight(Flight flight);
+    public boolean saveFlight(Flight flight);
 
-    //public Collection<Flight> readFlight();
+    public HashSet<Flight> getAllFlights();
 
-    //public void updateFlight();
+    public HashSet<Flight> getAllFlights(Person person);
 
-    //public void deleteFlight();
+    public boolean deleteFlight(Flight flight);
 
 }

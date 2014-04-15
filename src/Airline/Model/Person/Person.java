@@ -1,4 +1,4 @@
-package Airline.Models;
+package Airline.Model.Person;
 
 abstract public class Person {
 

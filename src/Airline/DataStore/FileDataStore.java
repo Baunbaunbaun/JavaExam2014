@@ -1,68 +1,67 @@
 package Airline.DataStore;
 
-import Airline.Models.Flight;
+import Airline.Model.Flight;
+import Airline.Model.Person.Person;
 
 import java.io.*;
-import java.util.HashMap;
+import java.util.HashSet;
 
 public class FileDataStore implements IDataStorage, Serializable {
 
-    private String file;
+    private String path;
 
-    private FileDataStore(String file) {
-        this.file = file;
-    }
+    private HashSet<Flight> flights;
 
-    public HashMap<Integer, Flight> flights = new HashMap<Integer, Flight>();
-
-    public void createFlight(Flight flight) {
-
-        this.flights.put(flight.id, flight);
-
-        this.write();
-    }
-
-    public void write() {
-
+    public FileDataStore(String path) {
+        this.path = path;
         try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
+            FileDataStore loadedDataStore = (FileDataStore) ois.readObject();
+            this.flights = loadedDataStore.flights;
+        } catch (Exception ex) {
+            this.flights = new HashSet<Flight>();
 
-            FileOutputStream fout = new FileOutputStream(this.file);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);
+        }
+    }
+
+    @Override
+    public boolean saveFlight(Flight flight) {
+
+        this.flights.add(flight);
+        return this.write();
+    }
+
+    @Override
+    public HashSet<Flight> getAllFlights() {
+        // Make new copy of collection
+        return new HashSet<Flight>(this.flights);
+    }
+
+    @Override
+    public HashSet<Flight> getAllFlights(Person person) {
+        HashSet<Flight> flightsWithPerson = new HashSet<Flight>();
+        for (Flight f : this.flights) {
+            if (f.getBookings().containsKey(person)) {
+                flightsWithPerson.add(f);
+            }
+        }
+        return flightsWithPerson;
+    }
+
+    @Override
+    public boolean deleteFlight(Flight flight) {
+        return this.flights.remove(flight);
+    }
+
+    private boolean write() {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(this.path));
             oos.writeObject(this);
             oos.close();
-            System.out.println("Done");
-
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return false;
         }
     }
-
-    public static FileDataStore load(String file) {
-
-        try {
-            FileInputStream fin = new FileInputStream(file);
-            ObjectInputStream ois = new ObjectInputStream(fin);
-            FileDataStore data = (FileDataStore) ois.readObject();
-            return data;
-        } catch (Exception ex) {
-            return new FileDataStore(file);
-        }
-    }
-
-
-
-
-    /*public Collection<Flight> readFlight() {
-
-        return this.flights.keySet();
-    }
-
-    public void updateFlight() {
-
-    }
-
-    public void deleteFlight() {
-        flights.clear();
-    }*/
 }
-
