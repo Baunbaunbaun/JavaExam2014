@@ -1,4 +1,4 @@
-package Airline.Models;
+package Airline.Model;
 
 //24 European airports
 public enum Airport {

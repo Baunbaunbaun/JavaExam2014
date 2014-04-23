@@ -1,10 +1,9 @@
-package Airline.Models;
+package Airline.Model.Person;
 
 abstract public class Person {
 
-    public String name;
+    public final String name;
 
-    //constructor
     public Person(String name) {
         this.name = name;
     }

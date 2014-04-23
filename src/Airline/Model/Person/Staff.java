@@ -1,4 +1,4 @@
-package Airline.Models;
+package Airline.Model.Person;
 
 public class Staff extends Person {
 
