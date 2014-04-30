@@ -5,6 +5,8 @@ import Airline.Model.Person.Customer;
 import Airline.Model.Person.Staff;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,12 +15,14 @@ import java.util.Random;
 public class Flight implements Serializable {
 
     public final Aircraft aircraft;
-    public final String id;
+    public final String flightNumber;
     public String idTest;
     public final Airport from;
     public final Airport to;
     public Date departureTime;
     private HashSet<Staff> crew = new HashSet<Staff>();
+    public HashSet<String> recordOfRemarks = new HashSet<String>();
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
     private Random random;
 
@@ -28,24 +32,30 @@ public class Flight implements Serializable {
 
     private HashMap<Customer, Booking> bookings = new HashMap<Customer, Booking>();
 
-    public Flight(Aircraft aircraft, Airport from, Airport to, int time) throws DateException{
+    public Flight(Aircraft aircraft, Airport from, Airport to, String time) throws DateException, ParseException {
 
+        this.aircraft = aircraft;
         this.from = from;
         this.to = to;
-        this.aircraft = aircraft;
+
+        // Parse the date
+        try {
+            departureTime = sdf.parse(time);
+        } catch (ParseException pe) {
+            System.out.println("Incorrect date format. Should be: yyyy-MM-dd hh:mm");
+        }
 
         Random random = new Random();
         int idNumber = 0;
-        String idString;
         int length = 0;
         String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int RANDOM_STRING_LENGTH = 2;
-        StringBuffer randStr = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < RANDOM_STRING_LENGTH; i++) {
             int number = random.nextInt(26);
             char ch = CHAR_LIST.charAt(number);
-            randStr.append(ch);
+            builder.append(ch);
         }
 
         for (int i = 0; length < 4; i++) {
@@ -53,16 +63,26 @@ public class Flight implements Serializable {
             length = String.valueOf(idNumber).length();
             idNumber = (length > 4) ? 0 : idNumber;
         }
-        this.idTest = randStr.toString() + idNumber;
-        this.id = idTest.toUpperCase();
+        //this.idTest = builder.toString() + idNumber;
+        //this.flightNumber = idTest.toUpperCase();
+        this.flightNumber = builder.toString() + idNumber;
 
-        System.out.println("\n flight no." + this.id);
+        Date recordDate = new Date();
+        this.recordOfRemarks.add("Flight.no. " + this.flightNumber + " was scheduled " + sdf.format(recordDate));
     }
 
     public boolean addStaff(Staff staff) {
-        if (this.crew.size() < this.aircraft.crewCapacity)
+        if (this.crew.size() < this.aircraft.crewCapacity) {
+            Date recordDate = new Date();
+            this.recordOfRemarks.add(sdf.format(recordDate) +
+                    "[ Staff " + staff + " was added to flight.no. " + this.flightNumber + " ]" );
             return this.crew.add(staff);
+        }
         return false;
+    }
+
+    public void clearStaff() {
+        this.crew.clear();
     }
 
     public void bookSeat(Customer customer) throws BookingException {
@@ -75,14 +95,22 @@ public class Flight implements Serializable {
 
     public void checkIn(Customer customer) {
         this.bookings.get(customer).checkIn();
+        Date recordDate = new Date();
+        this.recordOfRemarks.add(sdf.format(recordDate) +
+                "[ " + customer + " was checked-in on flight.no. " + this.flightNumber + " ]" );
     }
 
-    private int availableSeats() {
+    public HashSet<String> getRecordOfRemarks() {
+        return recordOfRemarks;
+    }
+
+    public int availableSeats() {
         return (this.aircraft.passengerCapacity - this.bookings.size());
     }
 
     public boolean save() {
-        Model.dataStore.saveFlight(this);
+        //Model.dataStore. saveFlight(this);
+        Model.dataStoreDB.saveFlight(this);
         return true;
     }
 
@@ -90,22 +118,24 @@ public class Flight implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb
-                .append("Id: ").append(this.id).append('\n')
-                .append("Aircraft: ").append(aircraft.name);
+                .append("FLIGHT: ").append(this.flightNumber).append("\n")
+                .append(this.from).append("-").append(this.to).append("\n")
+                .append("AIRCRAFT: ").append(aircraft.model).append("\n")
+                .append("SEATS AVAILABLE: ").append(this.availableSeats()).append("\n");
 
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.flightNumber.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof Flight) {
             Flight f = (Flight) other;
-            return this.id.equals(f.id);
+            return this.flightNumber.equals(f.flightNumber);
         }
         return false;
     }
@@ -131,4 +161,5 @@ public class Flight implements Serializable {
             this.checkedIn = true;
         }
     }
+
 }

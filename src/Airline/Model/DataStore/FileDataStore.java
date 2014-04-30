@@ -15,7 +15,7 @@ public class FileDataStore implements IDataStorage, Serializable {
     public FileDataStore(final String path) {
         this.path = path;
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(this.path));
             FileDataStore loadedDataStore = (FileDataStore) ois.readObject();
             this.flights = loadedDataStore.flights;
         } catch (Exception ex) {
@@ -32,7 +32,8 @@ public class FileDataStore implements IDataStorage, Serializable {
     }
     @Override
     public boolean saveFlight(Flight flight) {
-        return this.flights.add(flight);
+        //return this.flights.add(flight);
+        return true;
     }
 
     @Override
