@@ -58,6 +58,11 @@ public class FileDataStore implements IDataStorage, Serializable {
         return this.flights.remove(flight);
     }
 
+    @Override
+    public String getAllFlightAsString() {
+        return this.flights.toString();
+    }
+
     private boolean writeToDisk() {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(this.path));

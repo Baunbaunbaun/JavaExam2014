@@ -15,4 +15,6 @@ public interface IDataStorage {
 
     public boolean deleteFlight(Flight flight);
 
+    public String getAllFlightAsString();
+
 }
