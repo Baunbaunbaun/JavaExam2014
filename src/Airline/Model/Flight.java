@@ -100,7 +100,18 @@ public class Flight implements Serializable {
     }
 
     public void bookSeat(Customer customer) throws BookingException {
+
+
+
+
+
+
+
+
+
+
         if (this.availableSeats() > 0 && !this.bookings.containsKey(customer)) {
+
             this.bookings.put(customer, new Booking((customer)));
 
 

@@ -31,7 +31,6 @@ abstract public class Person implements Serializable {
     public Person(int number) {
         //Parse the number and check length
         this.idNumber = Integer.toString(number);
-        this.name = name;
 
         lenghtEightorTen.add(8);
         lenghtEightorTen.add(10);
