@@ -1,5 +1,6 @@
 package Airline.Model;
 
+import Airline.Application;
 import Airline.Model.Aircraft.Aircraft;
 import Airline.Model.Person.Customer;
 import Airline.Model.Person.Staff;
@@ -16,21 +17,24 @@ public class Flight implements Serializable {
 
     public final Aircraft aircraft;
     public final String flightNumber;
-    public String idTest;
     public final Airport from;
     public final Airport to;
     public Date departureTime;
+
+   //TODO: Staff shall in be a table
     private HashSet<Staff> crew = new HashSet<Staff>();
+
+   //TODO: Remarks shall in be a table
     public HashSet<String> recordOfRemarks = new HashSet<String>();
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
-    private Random random;
+   //TODO: Bookings shall in be a table
+    private HashMap<Customer, Booking> bookings = new HashMap<Customer, Booking>();
 
     public HashMap<Customer, Booking> getBookings() {
         return bookings;
     }
-
-    private HashMap<Customer, Booking> bookings = new HashMap<Customer, Booking>();
 
     public Flight(Aircraft aircraft, Airport from, Airport to, String time) throws DateException, ParseException {
 
@@ -38,44 +42,48 @@ public class Flight implements Serializable {
         this.from = from;
         this.to = to;
 
-        // Parse the date
+        //TODO: catch if its a previous date.
+        //Parse the date
         try {
             departureTime = sdf.parse(time);
         } catch (ParseException pe) {
             System.out.println("Incorrect date format. Should be: yyyy-MM-dd hh:mm");
         }
 
-        Random random = new Random();
-        int idNumber = 0;
-        int length = 0;
+        //Create random flight.no. CH-CH-int-int-int-int
+        Random rand = new Random();
+        int number;
         String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int RANDOM_STRING_LENGTH = 2;
-        StringBuilder builder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
+        //Two uppercase characters
         for (int i = 0; i < RANDOM_STRING_LENGTH; i++) {
-            int number = random.nextInt(26);
+            number = rand.nextInt(26);
             char ch = CHAR_LIST.charAt(number);
-            builder.append(ch);
+            sb.append(ch);
         }
 
-        for (int i = 0; length < 4; i++) {
-            idNumber = idNumber + random.nextInt(9999);
-            length = String.valueOf(idNumber).length();
-            idNumber = (length > 4) ? 0 : idNumber;
+        //Four digits
+        while (sb.length() < 6) {
+            sb.append(rand.nextInt(10));
         }
-        //this.idTest = builder.toString() + idNumber;
-        //this.flightNumber = idTest.toUpperCase();
-        this.flightNumber = builder.toString() + idNumber;
+        this.flightNumber = sb.toString();
 
+        //TODO: put remarks in a Remarks Table
+        //For the record
         Date recordDate = new Date();
         this.recordOfRemarks.add("Flight.no. " + this.flightNumber + " was scheduled " + sdf.format(recordDate));
     }
 
     public boolean addStaff(Staff staff) {
         if (this.crew.size() < this.aircraft.crewCapacity) {
+
+            //TODO: put remarks in a Remarks Table (and Staff in a Staff Table)
+            //For the record
             Date recordDate = new Date();
             this.recordOfRemarks.add(sdf.format(recordDate) +
-                    "[ Staff " + staff + " was added to flight.no. " + this.flightNumber + " ]" );
+                    "Staff " + staff + " was added to flight.no. " + this.flightNumber);
             return this.crew.add(staff);
         }
         return false;
@@ -83,11 +91,25 @@ public class Flight implements Serializable {
 
     public void clearStaff() {
         this.crew.clear();
+
+        //TODO: put remarks in a Remarks Table
+        //For the record
+        Date recordDate = new Date();
+        this.recordOfRemarks.add(sdf.format(recordDate) +
+                " All staff was cleared from flight.no. " + this.flightNumber);
     }
 
     public void bookSeat(Customer customer) throws BookingException {
-        if (this.availableSeats() > 0 && !this.bookings.containsKey(customer))
+        if (this.availableSeats() > 0 && !this.bookings.containsKey(customer)) {
             this.bookings.put(customer, new Booking((customer)));
+
+
+            //TODO: put remarks in a Remarks Table
+            //For the record
+            Date recordDate = new Date();
+            this.recordOfRemarks.add(sdf.format(recordDate) +
+                    " " + customer + " was booked on flight.no. " + this.flightNumber);
+        }
         else {
             throw new BookingException();
         }
@@ -95,9 +117,13 @@ public class Flight implements Serializable {
 
     public void checkIn(Customer customer) {
         this.bookings.get(customer).checkIn();
+
+        //TODO: put remarks in a Remarks Table
+
+        //For the record
         Date recordDate = new Date();
         this.recordOfRemarks.add(sdf.format(recordDate) +
-                "[ " + customer + " was checked-in on flight.no. " + this.flightNumber + " ]" );
+                " " + customer + " was checked-in on flight.no. " + this.flightNumber);
     }
 
     public HashSet<String> getRecordOfRemarks() {
@@ -109,8 +135,8 @@ public class Flight implements Serializable {
     }
 
     public boolean save() {
-        //Model.dataStore. saveFlight(this);
-        Model.dataStoreDB.saveFlight(this);
+        //Application.dataStoreFile.saveFlight(this);
+        Application.dataStoreDB.saveFlight(this);
         return true;
     }
 
@@ -122,7 +148,6 @@ public class Flight implements Serializable {
                 .append(this.from).append("-").append(this.to).append("\n")
                 .append("AIRCRAFT: ").append(aircraft.model).append("\n")
                 .append("SEATS AVAILABLE: ").append(this.availableSeats()).append("\n");
-
         return sb.toString();
     }
 
@@ -157,9 +182,15 @@ public class Flight implements Serializable {
             this.time = System.currentTimeMillis() / 1000L;
         }
 
-        public void checkIn() {
+        public void checkIn(Customer customer) {
             this.checkedIn = true;
+
+            //TODO:  create table column (in bookings table) with boolean checkedIn
+
+        }
+
+        //Overload
+        public void checkIn() {
         }
     }
-
 }

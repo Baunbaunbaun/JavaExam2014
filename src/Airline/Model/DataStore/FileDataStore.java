@@ -30,10 +30,10 @@ public class FileDataStore implements IDataStorage, Serializable {
             });
         }
     }
+
     @Override
     public boolean saveFlight(Flight flight) {
-        //return this.flights.add(flight);
-        return true;
+        return this.flights.add(flight);
     }
 
     @Override
